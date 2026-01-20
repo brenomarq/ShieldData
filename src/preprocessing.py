@@ -21,6 +21,8 @@ mask = df.duplicated(subset=["Texto Limpo"], keep="first") # Duplicata removida
 removidos = df[mask] # Retorna os dados removidos
 df = df[~mask] # Retorna o Dataframe sem o dado duplicado
 
+df.to_excel("data/processed/Hackathon Participa DF Data Processado.xlsx")  # exporta os dados processados para outro arquivo xlsx
+
 print(removidos) # Dados duplicados removidos
 
 print(df)
