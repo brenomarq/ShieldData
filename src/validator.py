@@ -96,3 +96,14 @@ class Validator:
     @classmethod
     def contains_rg(cls, text: str, timeout_s: float | None = None) -> bool:
         return cls._timed_search(cls._RG_RE, text or "", timeout_s or cls.DEFAULT_TIMEOUT_S)
+    
+    @classmethod
+    def validate_all_types(cls, text: str, timeout_s: float | None = None) -> dict[str, bool]:
+        """Retorna um dicionário com o status de cada validação."""
+        return {
+            "has_cpf": cls.contains_cpf(text, timeout_s),
+            "has_cnpj": cls.contains_cnpj(text, timeout_s),
+            "has_email": cls.contains_email(text, timeout_s),
+            "has_phone": cls.contains_phone_br(text, timeout_s),
+            "has_rg": cls.contains_rg(text, timeout_s)
+        }
