@@ -1,6 +1,8 @@
 import re
 import signal
 from contextlib import contextmanager
+from types import FrameType
+from re import Pattern
 
 
 class Validator:
@@ -55,8 +57,7 @@ class Validator:
         if not seconds or seconds <= 0:
             yield
             return
-
-        def _handler(signum, frame):
+        def _handler(signum: int, frame: FrameType | None) -> None:
             raise TimeoutError("regex timeout")
 
         old_handler = signal.getsignal(signal.SIGALRM)
@@ -69,7 +70,7 @@ class Validator:
             signal.signal(signal.SIGALRM, old_handler)
 
     @classmethod
-    def _timed_search(cls, pattern: re.Pattern, text: str, timeout_s: float) -> bool:
+    def _timed_search(cls, pattern: Pattern[str], text: str, timeout_s: float) -> bool:
         try:
             with cls._timeout(timeout_s):
                 return bool(pattern.search(text))
@@ -77,21 +78,21 @@ class Validator:
             return False
 
     @classmethod
-    def contains_cpf(cls, text: str, timeout_s: float = None) -> bool:
+    def contains_cpf(cls, text: str, timeout_s: float | None = None) -> bool:
         return cls._timed_search(cls._CPF_RE, text or "", timeout_s or cls.DEFAULT_TIMEOUT_S)
 
     @classmethod
-    def contains_cnpj(cls, text: str, timeout_s: float = None) -> bool:
+    def contains_cnpj(cls, text: str, timeout_s: float | None = None) -> bool:
         return cls._timed_search(cls._CNPJ_RE, text or "", timeout_s or cls.DEFAULT_TIMEOUT_S)
 
     @classmethod
-    def contains_email(cls, text: str, timeout_s: float = None) -> bool:
+    def contains_email(cls, text: str, timeout_s: float | None = None) -> bool:
         return cls._timed_search(cls._EMAIL_RE, text or "", timeout_s or cls.DEFAULT_TIMEOUT_S)
 
     @classmethod
-    def contains_phone_br(cls, text: str, timeout_s: float = None) -> bool:
+    def contains_phone_br(cls, text: str, timeout_s: float | None = None) -> bool:
         return cls._timed_search(cls._PHONE_BR_RE, text or "", timeout_s or cls.DEFAULT_TIMEOUT_S)
 
     @classmethod
-    def contains_rg(cls, text: str, timeout_s: float = None) -> bool:
+    def contains_rg(cls, text: str, timeout_s: float | None = None) -> bool:
         return cls._timed_search(cls._RG_RE, text or "", timeout_s or cls.DEFAULT_TIMEOUT_S)

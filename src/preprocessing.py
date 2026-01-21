@@ -1,11 +1,12 @@
 import pandas as pd
 import re
+from pandas import DataFrame
 
 file_path = "data/raw/Hackathon Participa DF Data.xlsx" # Caminho para o arquivo
-df = pd.read_excel(file_path, engine="openpyxl", index_col="ID") # Lê o arquivo python 
+df: DataFrame = pd.read_excel(file_path, engine="openpyxl", index_col="ID") # Lê o arquivo python 
 
 # Limpa a formatação dos espaços
-def safe_clean(text):
+def safe_clean(text: str) -> str:
     if pd.isna(text) or str(text).strip() == "":
         return ""
 
