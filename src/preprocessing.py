@@ -15,9 +15,9 @@ def safe_clean(text: str) -> str:
 
     return text
 
-df['Texto Limpo'] = df['Texto Mascarado'].apply(safe_clean) # Aplica a limpeza
+df['Texto Mascarado'] = df['Texto Mascarado'].apply(safe_clean) # Aplica a limpeza
 
-mask = df.duplicated(subset=["Texto Limpo"], keep="first") # Duplicata removida
+mask = df.duplicated(subset=["Texto Mascarado"], keep="first") # Duplicata removida
 
 removidos = df[mask] # Retorna os dados removidos
 df = df[~mask] # Retorna o Dataframe sem o dado duplicado
