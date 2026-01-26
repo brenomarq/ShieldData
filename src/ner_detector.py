@@ -1,4 +1,5 @@
 import spacy
+from spacy.util import is_package
 from typing import Dict
 
 
@@ -30,6 +31,13 @@ class NamedEntityDetector:
             Nome do modelo spaCy em português a ser utilizado.
             Exemplo: 'pt_core_news_sm' ou 'pt_core_news_md'
         """
+
+        if not is_package(model_name):
+            raise ImportError(
+                f"O modelo '{model_name}' não foi encontrado. "
+                f"Por favor, execute: python -m spacy download {model_name}"
+            )
+        
         self.nlp = spacy.load(model_name)
 
     def extract_signals(self, text: str) -> Dict[str, int]:
