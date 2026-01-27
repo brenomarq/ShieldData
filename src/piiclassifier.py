@@ -103,7 +103,7 @@ class PIIClassifier(nn.Module):
 # ==============================================================================
 # 3. O LOOP DE TREINO (Exemplo de função)
 # ==============================================================================
-def train_epoch(model: nn.Module, data_loader: DataLoader[Any], loss_fn: nn.Module, optimizer: torch.optim.Optimizer, device: torch.device, n_examples: int) -> tuple[float, float, float]:
+def train_epoch(model: nn.Module, data_loader: DataLoader[Any], loss_fn: nn.Module, optimizer: torch.optim.Optimizer, device: torch.device, n_examples: int) -> tuple[float, float, float, float]:
     model = model.train() # Coloca o modelo em modo de treino (ativa dropout, etc)
     
     losses: List[float] = []
@@ -145,5 +145,6 @@ def train_epoch(model: nn.Module, data_loader: DataLoader[Any], loss_fn: nn.Modu
     # Note: all_preds and all_targets are lists of tensors, we can stack them or pass as list
     # ScoreCalculator handles list of tensors if we ensure they are clean
     f1 = ScoreCalculator.calculate_f1(all_targets, all_preds)
+    recall = ScoreCalculator.calculate_recall(all_targets, all_preds)
     
-    return accuracy.item(), sum(losses) / len(losses), f1
+    return accuracy.item(), sum(losses) / len(losses), f1, recall
