@@ -31,7 +31,7 @@ class PIIDataset(Dataset[Any]):
         label = self.labels[item]
 
         # Tokenização: Transforma "Eu gosto de Python" em [101, 234, 567, ..., 102]
-        encoding = self.tokenizer.encode_plus(
+        encoding = self.tokenizer(
             text,
             add_special_tokens=True,    # Adiciona [CLS] no início e [SEP] no fim
             max_length=self.max_len,
