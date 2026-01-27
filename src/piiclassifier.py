@@ -132,5 +132,5 @@ def train_epoch(model: nn.Module, data_loader: DataLoader[Any], loss_fn: nn.Modu
         optimizer.step() # Atualiza os pesos
         optimizer.zero_grad() # Zera gradientes para o próximo passo
 
-    accuracy = correct_predictions.double() / n_examples # type: ignore
+    accuracy = correct_predictions.float() / n_examples # type: ignore
     return accuracy.item(), sum(losses) / len(losses)
