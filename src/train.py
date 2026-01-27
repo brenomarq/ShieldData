@@ -87,7 +87,7 @@ class ModelTrainer:
 
         
         for epoch in range(self.epochs):
-            acc, loss = train_epoch(
+            acc, loss, f1 = train_epoch(
                 model=self.model,
                 data_loader=self.data_loader,
                 loss_fn=self.loss_fn,
@@ -95,7 +95,7 @@ class ModelTrainer:
                 device=self.device,
                 n_examples=self.dataset_size
             )
-            print(f"Época {epoch + 1}/{self.epochs} | Acurácia: {acc:.4f} | Loss: {loss:.4f}")
+            print(f"Época {epoch + 1}/{self.epochs} | Acurácia: {acc:.4f} | F1 Score: {f1:.4f} | Loss: {loss:.4f}")
 
         
 

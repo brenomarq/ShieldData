@@ -3,6 +3,7 @@ import torch.nn as nn
 from torch.utils.data import Dataset, DataLoader
 from transformers import AutoTokenizer, AutoModel
 from typing import List, Any, cast
+from score_calculator import ScoreCalculator
 
 # ==============================================================================
 # 1. O PREPARADOR DE DADOS (Dataset)
@@ -102,11 +103,14 @@ class PIIClassifier(nn.Module):
 # ==============================================================================
 # 3. O LOOP DE TREINO (Exemplo de função)
 # ==============================================================================
-def train_epoch(model: nn.Module, data_loader: DataLoader[Any], loss_fn: nn.Module, optimizer: torch.optim.Optimizer, device: torch.device, n_examples: int) -> tuple[float, float]:
+def train_epoch(model: nn.Module, data_loader: DataLoader[Any], loss_fn: nn.Module, optimizer: torch.optim.Optimizer, device: torch.device, n_examples: int) -> tuple[float, float, float]:
     model = model.train() # Coloca o modelo em modo de treino (ativa dropout, etc)
     
     losses: List[float] = []
     correct_predictions: int | torch.Tensor = 0
+    
+    all_preds = []
+    all_targets = []
     
     for d in data_loader:
         input_ids = d["input_ids"].to(device)
@@ -126,6 +130,9 @@ def train_epoch(model: nn.Module, data_loader: DataLoader[Any], loss_fn: nn.Modu
         correct_predictions += torch.sum(preds == targets)
         losses.append(loss.item())
 
+        all_preds.extend(preds)
+        all_targets.extend(targets)
+
         # C. Backward Pass: "Aprender" com o erro
         loss.backward()  # Calcula gradientes (direção do ajuste)
         nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0) # Evita explosão de gradientes
@@ -133,4 +140,10 @@ def train_epoch(model: nn.Module, data_loader: DataLoader[Any], loss_fn: nn.Modu
         optimizer.zero_grad() # Zera gradientes para o próximo passo
 
     accuracy = correct_predictions.float() / n_examples # type: ignore
-    return accuracy.item(), sum(losses) / len(losses)
+    
+    # Calculate F1 using ScoreCalculator
+    # Note: all_preds and all_targets are lists of tensors, we can stack them or pass as list
+    # ScoreCalculator handles list of tensors if we ensure they are clean
+    f1 = ScoreCalculator.calculate_f1(all_targets, all_preds)
+    
+    return accuracy.item(), sum(losses) / len(losses), f1
