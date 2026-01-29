@@ -7,3 +7,4 @@ torch
 regex
 tqdm
 openpyxl
+pytest
