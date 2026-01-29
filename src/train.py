@@ -84,7 +84,7 @@ class ModelTrainer:
         if self.model is None or self.data_loader is None or self.optimizer is None:
             raise RuntimeError("Modelo, dados ou otimizador não inicializados. Execute load_data() e prepare_model() primeiro.")
 
-
+        final_metrics = {}
         
         for epoch in range(self.epochs):
             acc, loss, f1, recall = train_epoch(
@@ -96,10 +96,10 @@ class ModelTrainer:
                 n_examples=self.dataset_size
             )
             print(f"Época {epoch + 1}/{self.epochs} | Acurácia: {acc:.4f} | F1 Score: {f1:.4f} | Recall: {recall:.4f} | Loss: {loss:.4f}")
-
-        
+            final_metrics = {"accuracy": acc, "f1": f1, "recall": recall, "loss": loss}
 
         self.save_model()
+        return final_metrics
 
     def save_model(self):
         """Salva o estado do modelo no disco."""

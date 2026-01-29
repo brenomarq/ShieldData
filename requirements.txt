@@ -8,3 +8,4 @@ regex
 tqdm
 openpyxl
 pytest
+optuna
