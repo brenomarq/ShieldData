@@ -70,7 +70,9 @@ class Preprocessor:
 
         logger.info("Running Named Entity Recognition...")
         ner_detector = NamedEntityDetector()
-        sinais_list = df['Texto Mascarado'].apply(ner_detector.extract_signals).tolist()
+        # Use nlp.pipe for batch processing which is much faster
+        texts = df['Texto Mascarado'].astype(str).tolist()
+        sinais_list = ner_detector.extract_signals_batch(texts)
         df_sinais = pd.DataFrame(sinais_list, index=df.index)
         df = df.join(df_sinais)
 

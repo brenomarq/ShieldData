@@ -41,24 +41,55 @@ def test_compare_sample_vs_processed_labels():
         suffixes=('_sample', '_processed')
     )
 
+    # 5. Classifica os Resultados (Confusion Matrix)
+    def classify_prediction(row):
+        actual = row['Label']
+        pred = row['label']
+        
+        if actual == 1 and pred == 1:
+            return "True Positive"
+        elif actual == 0 and pred == 0:
+            return "True Negative"
+        elif actual == 0 and pred == 1: # Erro do tipo I
+            return "False Positive"
+        elif actual == 1 and pred == 0: # Erro do tipo II
+            return "False Negative"
+        return "Unknown"
+
+    merged['classification'] = merged.apply(classify_prediction, axis=1)
+
+    # 6. Calcula Métricas Detalhadas
+    tp = len(merged[merged['classification'] == "True Positive"])
+    tn = len(merged[merged['classification'] == "True Negative"])
+    fp = len(merged[merged['classification'] == "False Positive"])
+    fn = len(merged[merged['classification'] == "False Negative"])
+    params = tp + tn + fp + fn
+
+    accuracy = (tp + tn) / params if params > 0 else 0
+    precision = tp / (tp + fp) if (tp + fp) > 0 else 0
+    recall = tp / (tp + fn) if (tp + fn) > 0 else 0
+    f1 = 2 * (precision * recall) / (precision + recall) if (precision + recall) > 0 else 0
+
     print(f"\n--- Relatório de Comparação ---")
     print(f"Total de amostras na comparação: {len(merged)}")
+    print(f"Matriz de Confusão:")
+    print(f"  TP: {tp} | FP: {fp}")
+    print(f"  FN: {fn} | TN: {tn}")
+    print(f"Métricas:")
+    print(f"  Acurácia:  {accuracy:.2%}")
+    print(f"  Precisão:  {precision:.2%}")
+    print(f"  Recall:    {recall:.2%}")
+    print(f"  F1-Score:  {f1:.2%}")
 
-    # 5. Calcula Métricas Básicas
-    merged['match'] = merged['Label'] == merged['label']
-    accuracy = merged['match'].mean()
-    
-    print(f"Acurácia: {accuracy:.2%}")
-
-    # Identifica onde houve divergência
-    mismatches = merged[~merged['match']].copy()
+    # Identifica onde houve divergência (apenas FP e FN)
+    mismatches = merged[merged['classification'].isin(["False Positive", "False Negative"])].copy()
     
     if not mismatches.empty:
         print(f"\nEncontrados {len(mismatches)} casos de divergência.")
-        print("Detalhamento das divergências (quais sinais ativaram a Predição=1):")
+        print("Detalhamento das divergências:")
         
         # Seleciona colunas para exibição no terminal
-        display_cols = ['ID', 'Label', 'label'] + existing_feature_cols
+        display_cols = ['ID', 'Label', 'label', 'classification'] + existing_feature_cols
         print(mismatches[display_cols].to_string(index=False))
         
         # Salva o detalhamento em Excel para análise manual detalhada

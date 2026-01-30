@@ -17,7 +17,7 @@ Repositório criado para o Hackathon em Controle Social promovido pelo GDF em 20
 
 ```bash
 pip install -r requirements.txt
-python -m spacy download pt_core_news_sm
+python -m spacy download pt_core_news_lg
 ```
 
 ## Uso

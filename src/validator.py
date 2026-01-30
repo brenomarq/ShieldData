@@ -80,7 +80,7 @@ class Validator:
     _RG_RE = re.compile(
     r"""
     (?<!\d)
-    \d{2}\.\d{3}\.\d{3}[- ]?[0-9Xx]
+    \d{2}\.\d{3}\.\d{3}[- ][0-9Xx]
     (?!\d)
     """,
     re.VERBOSE
