@@ -21,8 +21,31 @@ class Validator:
 
     DEFAULT_TIMEOUT_S = 1.0
 
-    _CPF_RE = re.compile(r"(?<!\d)(?:\d{3}\.?\d{3}\.?\d{3}-?\d{2})(?!\d)")
-    _CNPJ_RE = re.compile(r"(?<!\d)(?:\d{2}\.?\d{3}\.?\d{3}/?\d{4}-?\d{2})(?!\d)")
+    _CPF_RE = re.compile(
+    r"""
+    (?<!\d)
+    (
+        \d{3}\.\d{3}\.\d{3}-\d{2}   # formato canônico
+        |
+        \d{11}                     # formato contínuo
+    )
+    (?!\d)
+    """,
+    re.VERBOSE
+    )
+    _CNPJ_RE = re.compile(
+    r"""
+    (?<!\d)
+    (
+        \d{2}\.\d{3}\.\d{3}/\d{4}-\d{2}  # formato canônico
+        |
+        \d{14}                           # formato contínuo
+    )
+    (?!\d)
+    """,
+    re.VERBOSE
+)
+
 
     _EMAIL_RE = re.compile(
         r"(?i)\b[a-z0-9](?:[a-z0-9._%+-]{0,62}[a-z0-9])?"
@@ -49,14 +72,27 @@ class Validator:
     )
 
     _RG_RE = re.compile(
-        r"""
-        (?<!\d)
-        (?:\d{1,2}\.?\d{3}\.?\d{3})
-        (?:-?[0-9Xx])?
-        (?!\d)
-        """,
-        re.VERBOSE,
+    r"""
+    (?<!\d)
+    \d{2}\.\d{3}\.\d{3}[- ]?[0-9Xx]
+    (?!\d)
+    """,
+    re.VERBOSE
     )
+
+    @staticmethod
+    def _is_valid_cpf(cpf: str) -> bool:
+        cpf = re.sub(r"\D", "", cpf)
+        if len(cpf) != 11 or cpf == cpf[0] * 11:
+            return False
+
+        for i in [9, 10]:
+            s = sum(int(cpf[j]) * (i + 1 - j) for j in range(i))
+            d = (s * 10) % 11
+            d = 0 if d == 10 else d
+            if d != int(cpf[i]):
+                return False
+        return True
 
     @staticmethod
     @contextmanager
@@ -87,7 +123,9 @@ class Validator:
     @classmethod
     def contains_cpf(cls, text: str, timeout_s: float | None = None) -> bool:
         """Verifica se o texto contém um padrão de CPF."""
-        return cls._timed_search(cls._CPF_RE, text or "", timeout_s or cls.DEFAULT_TIMEOUT_S)
+        match = cls._CPF_RE.search(text)
+        return bool(match and cls._is_valid_cpf(match.group()))
+        
 
     @classmethod
     def contains_cnpj(cls, text: str, timeout_s: float | None = None) -> bool:
