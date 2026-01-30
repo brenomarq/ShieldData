@@ -36,7 +36,7 @@ class Preprocessor:
         Generates a binary label based on the presence of PII signals.
         Returns 1 if any PII signal is found, 0 otherwise.
         """
-        cols = ["has_cpf", "has_cnpj", "has_email", "has_phone", "has_rg", "has_person_entity"]
+        cols = ["has_cpf", "has_email", "has_phone", "has_rg", "has_person_entity"]
         # Ensure we only check columns that actually exist in the row
         valid_cols = [col for col in cols if col in row.index]
         return 1 if any(row[col] == 1 for col in valid_cols) else 0
@@ -77,13 +77,6 @@ class Preprocessor:
         logger.info("Generating labels...")
         df['label'] = df.apply(self.generate_labels, axis=1)
 
-        logger.info("Removing duplicates...")
-        mask = df.duplicated(subset=["Texto Mascarado"], keep="first")
-        removidos = df[mask]
-        df = df[~mask]
-        
-        if not removidos.empty:
-            logger.info(f"Removed {len(removidos)} duplicate rows.")
 
         logger.info(f"Saving processed data to {output_path}...")
         try:

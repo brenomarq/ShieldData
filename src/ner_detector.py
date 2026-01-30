@@ -56,7 +56,9 @@ class NamedEntityDetector:
         """
         doc = self.nlp(text)
 
-        persons = [ent for ent in doc.ents if ent.label_ == "PER"]
+        # Filtra entidades de pessoas (PER) que possuem pelo menos 2 palavras (ex: Nome Sobrenome)
+        # Isso ajuda a reduzir falsos positivos com palavras isoladas que o modelo confunde com nomes.
+        persons = [ent for ent in doc.ents if ent.label_ == "PER" and len(ent.text.strip().split()) >= 2]
         locations = [ent for ent in doc.ents if ent.label_ in ("LOC", "GPE")]
         organizations = [ent for ent in doc.ents if ent.label_ == "ORG"]
 

@@ -15,8 +15,8 @@ class Validator:
     - RG (formatos comuns; heurístico)
 
     Timeout:
-    - Cada busca por regex é protegida por timeout (default: 1s).
-    - Implementação via signal (Unix/macOS/Linux) => funciona no *main thread*.
+    - Cada busca por regex é protegida por timeout (padrão: 1s).
+    - Implementação via signal (Unix/macOS/Linux) => funciona na *thread principal*.
     """
 
     DEFAULT_TIMEOUT_S = 1.0
@@ -33,9 +33,16 @@ class Validator:
     _PHONE_BR_RE = re.compile(
         r"""
         (?<!\d)
-        (?:\+?\s*55\s*)?
-        (?:\(?\s*\d{2}\s*\)?\s*)?
-        (?:9?\d{4}[\s.-]?\d{4})
+        (?:
+            # Caso 1: Com DDD (2 dígitos)
+            # +55 opcional, parênteses opcionais no DDD, espaço opcional depois
+            (?:(?:\+?55\s?)?\(?\d{2}\)?\s*)
+            # Número: 9 (opcional), 4 dígitos, separador (opcional), 4 dígitos
+            (?:9?\d{4}[-.\s]?\d{4})
+        |
+            # Caso 2: Sem DDD. DEVE ter separador (- ou .) para evitar falsos positivos com datas/IDs
+            (?:9?\d{4}[-.]\d{4})
+        )
         (?!\d)
         """,
         re.VERBOSE,
@@ -79,22 +86,27 @@ class Validator:
 
     @classmethod
     def contains_cpf(cls, text: str, timeout_s: float | None = None) -> bool:
+        """Verifica se o texto contém um padrão de CPF."""
         return cls._timed_search(cls._CPF_RE, text or "", timeout_s or cls.DEFAULT_TIMEOUT_S)
 
     @classmethod
     def contains_cnpj(cls, text: str, timeout_s: float | None = None) -> bool:
+        """Verifica se o texto contém um padrão de CNPJ."""
         return cls._timed_search(cls._CNPJ_RE, text or "", timeout_s or cls.DEFAULT_TIMEOUT_S)
 
     @classmethod
     def contains_email(cls, text: str, timeout_s: float | None = None) -> bool:
+        """Verifica se o texto contém um padrão de E-mail."""
         return cls._timed_search(cls._EMAIL_RE, text or "", timeout_s or cls.DEFAULT_TIMEOUT_S)
 
     @classmethod
     def contains_phone_br(cls, text: str, timeout_s: float | None = None) -> bool:
+        """Verifica se o texto contém um padrão de Telefone Brasileiro."""
         return cls._timed_search(cls._PHONE_BR_RE, text or "", timeout_s or cls.DEFAULT_TIMEOUT_S)
 
     @classmethod
     def contains_rg(cls, text: str, timeout_s: float | None = None) -> bool:
+        """Verifica se o texto contém um padrão de RG."""
         return cls._timed_search(cls._RG_RE, text or "", timeout_s or cls.DEFAULT_TIMEOUT_S)
     
     @classmethod
