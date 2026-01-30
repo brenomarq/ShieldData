@@ -80,7 +80,7 @@ class Preprocessor:
             df = df.join(df_sinais)
 
             logger.info("Generating labels...")
-            df['label'] = df.apply(self.generate_labels, axis=1)
+            df['Label'] = df.apply(self.generate_labels, axis=1)
 
 
         logger.info(f"Saving processed data to {output_path}...")
