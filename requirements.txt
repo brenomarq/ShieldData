@@ -1,0 +1,11 @@
+pandas>=2.2
+numpy>=2.1
+scikit-learn>=1.5
+spacy
+transformers
+torch
+regex
+tqdm
+openpyxl
+pytest
+optuna
