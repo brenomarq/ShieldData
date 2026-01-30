@@ -60,7 +60,7 @@ class ModelTrainer:
 
         df: DataFrame = pd.read_excel(self.data_path, engine="openpyxl", index_col="ID")
         
-        labels_list: list[int] = df["label"].tolist()
+        labels_list: list[int] = df["Label"].tolist()
         texts_list = df["Texto Mascarado"].astype(str).tolist()
         
         self.dataset_size = len(texts_list)
@@ -114,7 +114,7 @@ class ModelTrainer:
 if __name__ == "__main__":
     # Exemplo de configurações fáceis de ajustar
     trainer = ModelTrainer(
-        data_path="data/processed/Hackathon Participa DF Data Processado.xlsx",
+        data_path="data/processed/AMOSTRA_e-SIC_processed.xlsx",
         batch_size=16,      # Ajuste o tamanho do batch aqui
         learning_rate=2e-5, # Ajuste a learning rate aqui
         epochs=3,           # Ajuste o número de épocas aqui

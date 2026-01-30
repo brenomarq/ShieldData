@@ -41,7 +41,7 @@ class Preprocessor:
         valid_cols = [col for col in cols if col in row.index]
         return 1 if any(row[col] == 1 for col in valid_cols) else 0
 
-    def process_file(self, input_path: str, output_path: str):
+    def process_file(self, input_path: str, output_path: str, clean_only: bool = False):
         """
         Main processing logic: reads excel, cleans, validates, performs NER, labels, and saves.
         """
@@ -61,23 +61,26 @@ class Preprocessor:
              sys.exit(1)
 
         df['Texto Mascarado'] = df['Texto Mascarado'].apply(self.safe_clean)
+        
+        if clean_only:
+            logger.info("Skipping validation and NER steps as requested...")
+        else:
+            logger.info("Validating Regex patterns (CPF, CNPJ, etc)...")
+            # Validate patterns
+            df_labels = df['Texto Mascarado'].apply(Validator.validate_all_types).apply(pd.Series)
+            df_labels = df_labels.astype(int)
+            df = df.join(df_labels)
 
-        logger.info("Validating Regex patterns (CPF, CNPJ, etc)...")
-        # Validate patterns
-        df_labels = df['Texto Mascarado'].apply(Validator.validate_all_types).apply(pd.Series)
-        df_labels = df_labels.astype(int)
-        df = df.join(df_labels)
+            logger.info("Running Named Entity Recognition...")
+            ner_detector = NamedEntityDetector()
+            # Use nlp.pipe for batch processing which is much faster
+            texts = df['Texto Mascarado'].astype(str).tolist()
+            sinais_list = ner_detector.extract_signals_batch(texts)
+            df_sinais = pd.DataFrame(sinais_list, index=df.index)
+            df = df.join(df_sinais)
 
-        logger.info("Running Named Entity Recognition...")
-        ner_detector = NamedEntityDetector()
-        # Use nlp.pipe for batch processing which is much faster
-        texts = df['Texto Mascarado'].astype(str).tolist()
-        sinais_list = ner_detector.extract_signals_batch(texts)
-        df_sinais = pd.DataFrame(sinais_list, index=df.index)
-        df = df.join(df_sinais)
-
-        logger.info("Generating labels...")
-        df['label'] = df.apply(self.generate_labels, axis=1)
+            logger.info("Generating labels...")
+            df['label'] = df.apply(self.generate_labels, axis=1)
 
 
         logger.info(f"Saving processed data to {output_path}...")
@@ -92,11 +95,12 @@ def main():
     parser = argparse.ArgumentParser(description="ShieldData Preprocessing Script")
     parser.add_argument("--input", type=str, required=True, help="Path to input Excel file.")
     parser.add_argument("--output", type=str, required=True, help="Path to output Excel file.")
+    parser.add_argument("--clean-only", action="store_true", help="Only apply safe_clean to text, skipping NER and validation.")
     
     args = parser.parse_args()
     
     preprocessor = Preprocessor()
-    preprocessor.process_file(args.input, args.output)
+    preprocessor.process_file(args.input, args.output, clean_only=args.clean_only)
 
 if __name__ == "__main__":
     main()

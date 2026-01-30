@@ -25,8 +25,8 @@ def objective(trial):
     batch_size = trial.suggest_categorical("batch_size", [8, 16, 32])
     epochs = trial.suggest_int("epochs", 2, 5)
     
-    # Caminho dos dados (fixo ou parametrizável)
-    data_path = "data/processed/Hackathon Participa DF Data Processado.xlsx"
+    # Caminho dos dados
+    data_path = "data/processed/AMOSTRA_e-SIC_processed.xlsx"
     
     # Verifica se os dados existem antes de tentar treinar
     if not os.path.exists(data_path):
@@ -79,6 +79,26 @@ def main():
     print("  Melhores Parâmetros:")
     for key, value in study.best_params.items():
         print(f"    {key}: {value}")
+    print("="*40)
+
+    # 4. Treinar o modelo final com os melhores parâmetros e salvar
+    print("\nTreinando o modelo final com os melhores parâmetros...")
+    best_params = study.best_params
+    final_model_path = "models/best_model"
+    
+    final_trainer = ModelTrainer(
+        data_path="data/processed/AMOSTRA_e-SIC_processed.xlsx",
+        model_save_path=final_model_path,
+        batch_size=best_params["batch_size"],
+        learning_rate=best_params["learning_rate"],
+        epochs=best_params["epochs"]
+    )
+    
+    final_trainer.load_data()
+    final_trainer.prepare_model()
+    final_trainer.train()
+    
+    print(f"\nModelo final otimizado salvo em: {final_model_path}")
     print("="*40)
 
 if __name__ == "__main__":
