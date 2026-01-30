@@ -8,7 +8,7 @@ import sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../src')))
 
 SAMPLE_FILE = os.path.abspath(os.path.join(os.path.dirname(__file__), '../data/raw/AMOSTRA_e-SIC.xlsx'))
-PROCESSED_FILE = os.path.abspath(os.path.join(os.path.dirname(__file__), '../data/processed/Hackathon Participa DF Data Processado.xlsx'))
+PROCESSED_FILE = os.path.abspath(os.path.join(os.path.dirname(__file__), '../data/processed/AMOSTRA_e-SIC_processed.xlsx'))
 
 def test_compare_sample_vs_processed_labels():
     """

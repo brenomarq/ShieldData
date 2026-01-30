@@ -17,6 +17,7 @@ class Validator:
     Timeout:
     - Cada busca por regex é protegida por timeout (padrão: 1s).
     - Implementação via signal (Unix/macOS/Linux) => funciona na *thread principal*.
+    - NOTA: Esta implementação de timeout NÃO funciona em threads secundárias.
     """
 
     DEFAULT_TIMEOUT_S = 1.0

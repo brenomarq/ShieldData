@@ -1,6 +1,7 @@
 from piiclassifier import PIIClassifier, PIIDataset, train_epoch
 from pandas import DataFrame
 from torch.utils.data import DataLoader
+from utils import get_best_device, validate_file_exists, ensure_dir_exists
 import pandas as pd
 import torch
 import os
@@ -38,13 +39,8 @@ class ModelTrainer:
         if device:
             self.device = torch.device(device)
         else:
-            # Tenta detectar CUDA ou MPS , senão fallback para CPU
-            if torch.cuda.is_available():
-                self.device = torch.device("cuda")
-            elif hasattr(torch.backends, "mps") and torch.backends.mps.is_available():
-                self.device = torch.device("mps")
-            else:
-                self.device = torch.device("cpu")
+            # Tenta detectar CUDA ou MPS, senão fallback para CPU
+            self.device = get_best_device()
         
         self.model = None
         self.data_loader = None
@@ -76,7 +72,7 @@ class ModelTrainer:
         self.model = PIIClassifier(model_name=self.model_name)
         self.model = self.model.to(self.device)
         
-        # Otimizador dos pesos AdamW
+        # Otimizador AdamW para ajuste dos pesos
         self.optimizer = torch.optim.AdamW(self.model.parameters(), lr=self.learning_rate)
 
     def train(self):

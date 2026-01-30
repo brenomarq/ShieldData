@@ -4,12 +4,12 @@ import logging
 import sys
 import os
 
-# Ensure src is in path
+# Garante que src está no path
 sys.path.append(os.path.join(os.getcwd(), 'src'))
 
 from train import ModelTrainer
 
-# Configure logging
+# Configuração de logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
@@ -46,7 +46,7 @@ def objective(trial):
         batch_size=batch_size,
         learning_rate=learning_rate,
         epochs=epochs,
-        device=None # Deixe None para detectar automaticamente (usará MPS no Mac)
+        device=None  # Deixe None para detectar automaticamente (usará MPS no Mac)
     )
     
     trainer.load_data()
@@ -68,7 +68,7 @@ def main():
     logger.info(f"Iniciando estudo com {args.trials} tentativas...")
     
     # Cria o estudo do Optuna
-    study = optuna.create_study(direction="maximize") # Queremos MAXIMIZAR o F1
+    study = optuna.create_study(direction="maximize")  # Queremos MAXIMIZAR o F1
     study.optimize(objective, n_trials=args.trials)
 
     print("\n" + "="*40)

@@ -8,7 +8,7 @@ from pandas import DataFrame
 from validator import Validator
 from ner_detector import NamedEntityDetector
 
-# Configure logging
+# Configuração de logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
@@ -71,9 +71,9 @@ class Preprocessor:
             df_labels = df_labels.astype(int)
             df = df.join(df_labels)
 
-            logger.info("Running Named Entity Recognition...")
+            logger.info("Executando reconhecimento de entidades nomeadas (NER)...")
             ner_detector = NamedEntityDetector()
-            # Use nlp.pipe for batch processing which is much faster
+            # Usa nlp.pipe para processamento em lote, que é muito mais rápido
             texts = df['Texto Mascarado'].astype(str).tolist()
             sinais_list = ner_detector.extract_signals_batch(texts)
             df_sinais = pd.DataFrame(sinais_list, index=df.index)

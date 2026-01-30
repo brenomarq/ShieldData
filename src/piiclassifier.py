@@ -63,9 +63,10 @@ class PIIClassifier(nn.Module):
         super(PIIClassifier, self).__init__()
         # Carregamos o cérebro pré-treinado
         self.bert = AutoModel.from_pretrained(model_name)
+        self.tokenizer = AutoTokenizer.from_pretrained(model_name)
         
-        # Adicionamos uma camada de Dropout (desliga neurônios aleatórios para evitar decorar dados/overfitting)
-        self.drop = nn.Dropout(p=0.3)
+        # Adicionamos uma camada de Dropout com p=0.5 para dificultar overfitting
+        self.drop = nn.Dropout(p=0.5)
         
         # A camada final: transforma 768 características do BERT em n_classes (2: Sim/Não)
         hidden_size = cast(int, self.bert.config.hidden_size) # type: ignore
