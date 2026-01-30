@@ -54,22 +54,28 @@ class Validator:
     )
 
     _PHONE_BR_RE = re.compile(
-        r"""
-        (?<!\d)
-        (?:
-            # Caso 1: Com DDD (2 dígitos)
-            # +55 opcional, parênteses opcionais no DDD, espaço opcional depois
-            (?:(?:\+?55\s?)?\(?\d{2}\)?\s*)
-            # Número: 9 (opcional), 4 dígitos, separador (opcional), 4 dígitos
-            (?:9?\d{4}[-.\s]?\d{4})
-        |
-            # Caso 2: Sem DDD. DEVE ter separador (- ou .) para evitar falsos positivos com datas/IDs
-            (?:9?\d{4}[-.]\d{4})
+    r"""
+    (?<!\d)
+    (?:
+        # CASO 1 — Com DDD (fixo ou celular)
+        (?:(?:\+?55\s?)?\(?\d{2}\)?[\s.-]?)
+        (
+            # Celular: 9XXXX-XXXX ou 9XXXXXXXX
+            9\d{4}[-.\s]?\d{4}
+            |
+            # Fixo: XXXX-XXXX (somente com DDD)
+            \d{4}[-.]\d{4}
         )
-        (?!\d)
-        """,
-        re.VERBOSE,
+
+        |
+        # CASO 2 — Sem DDD (somente celular, 9 dígitos obrigatórios)
+        9\d{4}[-.\s]?\d{4}
     )
+    (?!\d)
+    """,
+    re.VERBOSE,
+    )
+
 
     _RG_RE = re.compile(
     r"""
