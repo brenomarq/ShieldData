@@ -63,13 +63,21 @@ def evaluate():
         # C. Previsão Baseline (Apenas Regex + NER, sem BERT)
         # Lógica: Se qualquer Regex bater OU qualquer entidade NER for encontrada -> É PII
         # Essa é a lógica tradicional determinística.
+        # O Classificador Híbrido pode pular o NER por performance se o BERT estiver confiante.
+        # Mas para calcular a Baseline, precisamos rodar o NER manualmente se ele não veio no resultado.
+        if "ner" in h_result["details"]:
+            has_person_entity = h_result["details"]["ner"]["has_person_entity"]
+        else:
+            ner_results = hybrid.ner_detector.extract_signals(text)
+            has_person_entity = ner_results["has_person_entity"]
+
         is_baseline_pii = (
             h_result["details"]["regex"]["has_cpf"] or
             h_result["details"]["regex"]["has_cnpj"] or
             h_result["details"]["regex"]["has_email"] or
             h_result["details"]["regex"]["has_phone"] or
             h_result["details"]["regex"]["has_rg"] or
-            h_result["details"]["ner"]["has_person_entity"]
+            has_person_entity
         )
         baseline_preds.append(1 if is_baseline_pii else 0)
 

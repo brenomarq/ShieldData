@@ -5,13 +5,19 @@ Este arquivo contém exemplos prontos para usar do sistema ShieldData.
 Copie e adapte conforme necessário.
 """
 
+import sys
+import os
+
+# Adiciona o diretório 'src' ao sys.path para permitir importações diretas
+sys.path.append(os.path.join(os.path.dirname(__file__), 'src'))
+
 # ============================================================================
 # EXEMPLO 1: Classificação Simples
 # ============================================================================
 
 def exemplo_classificacao_simples():
     """Exemplo básico de classificação de um texto."""
-    from src.hybrid_classifier import HybridClassifier
+    from hybrid_classifier import HybridClassifier
     
     # Inicializar classificador
     classifier = HybridClassifier(model_path="models/best_model")
@@ -44,7 +50,7 @@ def exemplo_classificacao_simples():
 def exemplo_processamento_lote():
     """Processar múltiplos textos de um arquivo Excel."""
     import pandas as pd
-    from src.hybrid_classifier import HybridClassifier
+    from hybrid_classifier import HybridClassifier
     
     print("\n" + "=" * 70)
     print("EXEMPLO 2: Processamento em Lote")
@@ -97,7 +103,7 @@ def exemplo_processamento_lote():
 
 def exemplo_ajuste_threshold():
     """Demonstrar como diferentes thresholds afetam a classificação."""
-    from src.hybrid_classifier import HybridClassifier
+    from hybrid_classifier import HybridClassifier
     
     print("\n" + "=" * 70)
     print("EXEMPLO 3: Ajuste de Threshold")
@@ -129,7 +135,7 @@ def exemplo_ajuste_threshold():
 
 def exemplo_analise_detalhada():
     """Mostrar detalhes completos da classificação."""
-    from src.hybrid_classifier import HybridClassifier
+    from hybrid_classifier import HybridClassifier
     import json
     
     print("\n" + "=" * 70)
@@ -174,7 +180,7 @@ def exemplo_analise_detalhada():
 
 def exemplo_comparacao():
     """Comparar classificação de textos similares."""
-    from src.hybrid_classifier import HybridClassifier
+    from hybrid_classifier import HybridClassifier
     
     print("\n" + "=" * 70)
     print("EXEMPLO 5: Comparação de Textos")
@@ -218,7 +224,7 @@ def exemplo_comparacao():
 
 def exemplo_estatisticas():
     """Gerar estatísticas de um conjunto de textos."""
-    from src.hybrid_classifier import HybridClassifier
+    from hybrid_classifier import HybridClassifier
     
     print("\n" + "=" * 70)
     print("EXEMPLO 6: Estatísticas de Dataset")
